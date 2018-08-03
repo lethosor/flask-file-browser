@@ -8,4 +8,3 @@ class DevConfig(BaseConfig):
 
 class ProdConfig(BaseConfig):
     FILE_PATH = '/home/dfhack/files'
-    USE_X_SENDFILE = True
