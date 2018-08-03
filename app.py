@@ -2,8 +2,11 @@ import os
 import time
 
 import humanize
+import markdown
 
 from flask import abort, Flask, render_template, request, safe_join, send_from_directory, url_for
+
+README_NAME = 'README.md'
 
 app = Flask(__name__)
 app.config.from_object(os.environ.get('CONFIG', 'config.ProdConfig'))
@@ -34,7 +37,8 @@ def file_list(path=''):
                 'url': url_for('file_list', path=os.path.join(path, e.name) +
                     ('/' if not e.is_file() else '')),
                 'stat': e.stat(),
-            } for e in list(os.scandir(real_path))]
+            } for e in list(os.scandir(real_path))
+                if e.name != README_NAME]
         # folders on top, then alphabetically
         entries.sort(key=lambda e: (e['is_file'], e['name']))
 
@@ -52,8 +56,17 @@ def file_list(path=''):
             })
         breadcrumbs[-1]['last'] = True
 
+        readme_path = os.path.join(real_path, README_NAME)
+        readme_html = ''
+        try:
+            if os.path.isfile(readme_path):
+                with open(readme_path) as f:
+                    readme_html = markdown.markdown(f.read())
+        except Exception:
+            readme_html = '<div class="alert alert-warning">Could not parse folder description</div>'
+
         return render_template('list.html', path=human_path, entries=entries,
-            breadcrumbs=breadcrumbs)
+            breadcrumbs=breadcrumbs, readme_html=readme_html)
     elif os.path.isfile(real_path):
         return send_from_directory(app.config['FILE_PATH'], path)
     else:
