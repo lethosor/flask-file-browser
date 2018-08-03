@@ -4,6 +4,14 @@
   <title>Files in {{path}}</title>
 </head>
 <body>
+  {% for bc in breadcrumbs %}
+    <a href="{{bc.url}}">{{bc.name}}</a> {% if not bc.last %}&raquo;{% endif %}
+  {% endfor %}
   <h1>Files in {{path}}</h1>
+  <ul>
+    {% for entry in entries %}
+      <li><a href="{{entry.url}}">{{entry.name}}{% if not entry.is_file %}/{% endif %}</a></li>
+    {% endfor %}
+  </ul>
 </body>
 </html>
