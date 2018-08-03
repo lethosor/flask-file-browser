@@ -10,7 +10,11 @@
   <h1>Files in {{path}}</h1>
   <ul>
     {% for entry in entries %}
-      <li><a href="{{entry.url}}">{{entry.name}}{% if not entry.is_file %}/{% endif %}</a></li>
+      <li><a href="{{entry.url}}">{{entry.name}}{% if not entry.is_file %}/{% endif %}
+      {% if entry.is_file %}
+        ({{entry.stat.st_size}})
+      {% endif %}
+      </a></li>
     {% endfor %}
   </ul>
 </body>

@@ -24,7 +24,10 @@ def file_list(path=''):
                 'is_file': e.is_file(),
                 'url': url_for('file_list', path=os.path.join(path, e.name) +
                     ('/' if not e.is_file() else '')),
+                'stat': e.stat(),
             } for e in list(os.scandir(real_path))]
+        # folders on top, then alphabetically
+        entries.sort(key=lambda e: (e['is_file'], e['name']))
 
         path_parts = list(filter(bool, path.split('/')))
         breadcrumbs = []
