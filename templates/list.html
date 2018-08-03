@@ -33,7 +33,6 @@
         <tr>
           <th>Name</th>
           <th>Size</th>
-          <th>Created</th>
           <th>Modified</th>
         </tr>
       </thead>
@@ -42,7 +41,6 @@
         <tr>
           <td><a href="{{entry.url}}">{{entry.name}}</a></td>
           <td>{% if entry.is_file %} {{entry.stat.st_size | humanize_size}} {% else %} Folder {% endif %}</td>
-          <td>{{entry.stat.st_ctime | date_time}}</td>
           <td>{{entry.stat.st_mtime | date_time}}</td>
         </tr>
         {% endfor %}
