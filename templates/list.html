@@ -27,24 +27,28 @@
       </ol>
     </nav>
     {{readme_html|safe}}
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Size</th>
-          <th>Modified</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for entry in entries %}
-        <tr>
-          <td><a href="{{entry.url}}">{{entry.name}}</a></td>
-          <td>{% if entry.is_file %} {{entry.stat.st_size | humanize_size}} {% else %} Folder {% endif %}</td>
-          <td>{{entry.stat.st_mtime | date_time}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {% if entries %}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Modified</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in entries %}
+          <tr>
+            <td><a href="{{entry.url}}">{{entry.name}}</a></td>
+            <td>{% if entry.is_file %} {{entry.stat.st_size | humanize_size}} {% else %} Folder {% endif %}</td>
+            <td>{{entry.stat.st_mtime | date_time}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="alert alert-danger">No files found in this folder. <a href="..">Back</a></div>
+    {% endif %}
   </div>
 </body>
 </html>
