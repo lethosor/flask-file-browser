@@ -1,4 +1,6 @@
 import os
+import time
+
 from flask import abort, Flask, render_template, request, send_file, url_for
 import humanize
 
@@ -8,6 +10,10 @@ app.config.from_object(os.environ.get('CONFIG', 'config.ProdConfig'))
 @app.template_filter('humanize_size')
 def humanize_size(size):
     return humanize.naturalsize(size)
+
+@app.template_filter('date_time')
+def date_time_filter(raw):
+    return time.strftime('%c %Z', time.localtime(raw))
 
 @app.route('/')
 @app.route('/<path:path>')

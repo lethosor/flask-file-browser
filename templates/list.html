@@ -27,15 +27,26 @@
         {% endfor %}
       </ol>
     </nav>
-    <ul>
-      {% for entry in entries %}
-        <li><a href="{{entry.url}}">{{entry.name}}{% if not entry.is_file %}/{% endif %}
-        {% if entry.is_file %}
-          ({{entry.stat.st_size | humanize_size}})
-        {% endif %}
-        </a></li>
-      {% endfor %}
-    </ul>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Size</th>
+          <th>Created</th>
+          <th>Modified</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in entries %}
+        <tr>
+          <td><a href="{{entry.url}}">{{entry.name}}</a></td>
+          <td>{% if entry.is_file %} {{entry.stat.st_size | humanize_size}} {% else %} Folder {% endif %}</td>
+          <td>{{entry.stat.st_ctime | date_time}}</td>
+          <td>{{entry.stat.st_mtime | date_time}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </body>
 </html>
