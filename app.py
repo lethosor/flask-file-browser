@@ -38,7 +38,7 @@ def file_list(path=''):
                     ('/' if not e.is_file() else '')),
                 'stat': e.stat(),
             } for e in list(os.scandir(real_path))
-                if e.name != README_NAME]
+                if e.name != README_NAME and not e.name.startswith('.')]
         # folders on top, then alphabetically
         entries.sort(key=lambda e: (e['is_file'], e['name']))
 
