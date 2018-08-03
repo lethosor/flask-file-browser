@@ -9,7 +9,7 @@ app.config.from_object(os.environ.get('CONFIG', 'config.ProdConfig'))
 def file_list(path=''):
     basedir = app.config['FILE_PATH']
     real_path = os.path.realpath(os.path.join(basedir, path))
-    human_path = path + '/'
+    human_path = path.rstrip('/') + '/'
 
     if not real_path.startswith(basedir):
         abort(400)
