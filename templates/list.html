@@ -21,9 +21,7 @@
           {% if bc.last %}
             <li class="breadcrumb-item active" aria-current="page">{{bc.name}}</li>
           {% else %}
-            <li class="breadcrumb-item">
-              <a href="{{bc.url}}">{{bc.name}}</a>
-            </li>
+            <li class="breadcrumb-item"><a href="{{bc.url}}">{{bc.name}}</a></li>
           {% endif %}
         {% endfor %}
       </ol>
