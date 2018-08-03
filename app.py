@@ -35,20 +35,18 @@ def file_list(path=''):
         entries.sort(key=lambda e: (e['is_file'], e['name']))
 
         path_parts = list(filter(bool, path.split('/')))
-        breadcrumbs = []
-        if path and path != '/':
+        breadcrumbs = [{
+            'name': 'Root',
+            'url': url_for('file_list'),
+            'last': False,
+        }]
+        for i in range(len(path_parts)):
             breadcrumbs.append({
-                'name': 'Root',
-                'url': url_for('file_list'),
+                'name': path_parts[i],
+                'url': url_for('file_list', path='/'.join(path_parts[:i+1]) + '/'),
                 'last': False,
             })
-            for i in range(len(path_parts) - 1):
-                breadcrumbs.append({
-                    'name': path_parts[i],
-                    'url': url_for('file_list', path='/'.join(path_parts[:i+1]) + '/'),
-                    'last': False,
-                })
-            breadcrumbs[-1]['last'] = True
+        breadcrumbs[-1]['last'] = True
 
         return render_template('list.html', path=human_path, entries=entries,
             breadcrumbs=breadcrumbs)
