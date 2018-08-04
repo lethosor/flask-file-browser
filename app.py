@@ -9,7 +9,7 @@ from flask import abort, Flask, render_template, request, safe_join, send_from_d
 README_NAME = 'README.md'
 
 app = Flask(__name__)
-app.config.from_object(os.environ.get('CONFIG', 'config.ProdConfig'))
+app.config.from_object('config')
 
 fa_icons = {
     'txt': 'file-alt',

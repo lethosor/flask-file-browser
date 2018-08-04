@@ -1,10 +1,8 @@
 import os
 
-class BaseConfig(object):
+FILE_PATH = os.path.join(os.getcwd(), 'files')
+
+try:
+    from local_config import *
+except ImportError:
     pass
-
-class DevConfig(BaseConfig):
-    FILE_PATH = os.path.join(os.getcwd(), 'files')
-
-class ProdConfig(BaseConfig):
-    FILE_PATH = '/home/dfhack/files'
