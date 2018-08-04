@@ -20,8 +20,10 @@ fa_icons = {
 def guess_fa_icon(filename, is_folder=False):
     if is_folder:
         return 'folder-open'
-    ext = os.path.splitext(filename)[1].strip('.')
-    return fa_icons.get(ext) or fa_icons.get(ext.split('.')[0]) or 'file'
+    for part in reversed(filename.split('.')):
+        if part in fa_icons:
+            return fa_icons[part]
+    return 'file'
 
 @app.template_filter('humanize_size')
 def humanize_size(size):
