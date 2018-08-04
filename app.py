@@ -11,6 +11,18 @@ README_NAME = 'README.md'
 app = Flask(__name__)
 app.config.from_object(os.environ.get('CONFIG', 'config.ProdConfig'))
 
+fa_icons = {
+    'txt': 'file-alt',
+    'zip': 'file-archive',
+    'tar': 'file-archive',
+    'pdf': 'file-pdf',
+}
+def guess_fa_icon(filename, is_folder=False):
+    if is_folder:
+        return 'folder-open'
+    ext = os.path.splitext(filename)[1].strip('.')
+    return fa_icons.get(ext) or fa_icons.get(ext.split('.')[0]) or 'file'
+
 @app.template_filter('humanize_size')
 def humanize_size(size):
     return humanize.naturalsize(size)
@@ -37,6 +49,7 @@ def file_list(path=''):
                 'url': url_for('file_list', path=os.path.join(path, e.name) +
                     ('/' if not e.is_file() else '')),
                 'stat': e.stat(),
+                'icon': guess_fa_icon(e.name, not e.is_file()),
             } for e in list(os.scandir(real_path))
                 if e.name != README_NAME and not e.name.startswith('.')]
         # folders on top, then alphabetically
