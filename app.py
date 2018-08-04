@@ -12,17 +12,26 @@ app = Flask(__name__)
 app.config.from_object('config')
 
 fa_icons = {
-    'txt': 'file-alt',
-    'zip': 'file-archive',
-    'tar': 'file-archive',
-    'pdf': 'file-pdf',
+    ('txt'): 'file-alt',
+    ('zip', 'tar', 'gz', 'bz2', 'xz', 'Z', 'rar', '7z'): 'file-archive',
+    ('pdf'): 'file-pdf',
+    ('doc', 'docx'): 'file-word',
+    ('xls', 'xlsx'): 'file-excel',
+    ('ppt', 'pptx'): 'file-powerpoint',
+    ('jpg', 'jpeg', 'gif', 'png', 'bmp', 'tif', 'tiff', 'ico', 'icn', 'icns'): 'file-image',
+    ('webm', 'mkv', 'flv', 'flv', 'vob', 'ogv', 'ogg', 'drc', 'gif', 'gifv',
+        'mng', 'avi', 'mov', 'qt', 'wmv', 'yuv', 'rm', 'rmvb', 'asf', 'amv',
+        'mp4', 'm4p', 'm4v', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'mpg', 'mpeg',
+        'm2v', 'm4v', 'svi', '3gp', '3g2', 'mxf', 'roq', 'nsv', 'flv', 'f4v',
+        'f4p', 'f4a', 'f4b'): 'file-video',
 }
 def guess_fa_icon(filename, is_folder=False):
     if is_folder:
         return 'folder-open'
     for part in reversed(filename.split('.')):
-        if part in fa_icons:
-            return fa_icons[part]
+        for k, v in fa_icons.items():
+            if k == part or (isinstance(k, tuple) and part in k):
+                return v
     return 'file'
 
 @app.template_filter('humanize_size')
