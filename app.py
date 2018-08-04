@@ -59,7 +59,7 @@ def file_list(path=''):
 
         path_parts = list(filter(bool, path.split('/')))
         breadcrumbs = [{
-            'name': 'Root',
+            'name': app.config['SITE_NAME'],
             'url': url_for('file_list'),
             'last': False,
         }]
