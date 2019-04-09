@@ -42,6 +42,11 @@ def humanize_size(size):
 def date_time_filter(raw):
     return time.strftime('%c %Z', time.localtime(raw))
 
+@app.errorhandler(404)
+def handle_404(*_):
+    # note that we set the 404 status explicitly
+    return render_template('404.html'), 404
+
 @app.route('/')
 @app.route('/<path:path>')
 def file_list(path=''):
