@@ -2,6 +2,7 @@ import os
 import time
 
 import humanize
+import jinja2
 import markdown
 
 from flask import abort, Flask, render_template, request, safe_join, send_from_directory, url_for
@@ -95,7 +96,7 @@ def file_list(path=''):
             readme_html = '<div class="alert alert-warning">Could not parse folder description</div>'
 
         return render_template('list.html', path=human_path, entries=entries,
-            breadcrumbs=breadcrumbs, readme_html=readme_html)
+            breadcrumbs=breadcrumbs, readme_html=jinja2.Markup(readme_html))
     elif os.path.isfile(real_path):
         return send_from_directory(app.config['FILE_PATH'], path)
     else:
