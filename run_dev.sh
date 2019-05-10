@@ -1,5 +1,5 @@
 #!/bin/sh
 cd $(dirname "$0")
-. bin/activate
+. env/bin/activate
 export FLASK_DEBUG=true
 flask run
