@@ -1,7 +1,8 @@
 version: "3.7"
 services:
   web:
-    image: lethosor/flask-file-browser:latest
+    build:
+      context: .
     ports:
       - "127.0.0.1:${PORT}:8000"
     restart: always
