@@ -4,6 +4,7 @@ import time
 import humanize
 import jinja2
 import markdown
+import redis
 
 from flask import abort, Flask, render_template, request, safe_join, send_from_directory, url_for
 
@@ -11,6 +12,8 @@ README_NAME = 'README.md'
 
 app = Flask(__name__)
 app.config.from_object('config')
+
+redis_client = redis.Redis('redis')
 
 fa_icons = {
     ('txt'): 'file-alt',
@@ -34,6 +37,18 @@ def guess_fa_icon(filename, is_folder=False):
             if k == part or (isinstance(k, tuple) and part in k):
                 return v
     return 'file'
+
+def get_download_count(path):
+    if not os.path.isfile(path):
+        return None
+    count = redis_client.hget('file:' + path, 'downloads')
+    try:
+        return int(count)
+    except (TypeError, ValueError):
+        return 0
+
+def incr_download_count(path):
+    return redis_client.hincrby('file:' + path, 'downloads', 1)
 
 @app.template_filter('humanize_size')
 def humanize_size(size):
@@ -67,8 +82,12 @@ def file_list(path=''):
                     ('/' if not e.is_file() else '')),
                 'stat': e.stat(),
                 'icon': guess_fa_icon(e.name, not e.is_file()),
+                'downloads': get_download_count(os.path.join(real_path, e.name)),
             } for e in list(os.scandir(real_path))
                 if e.name != README_NAME and not e.name.startswith('.')]
+        for entry in entries:
+            if entry['downloads'] is None:
+                entry['downloads'] = ''
         # folders on top, then alphabetically
         entries.sort(key=lambda e: (e['is_file'], e['name']))
 
@@ -98,6 +117,7 @@ def file_list(path=''):
         return render_template('list.html', path=human_path, entries=entries,
             breadcrumbs=breadcrumbs, readme_html=jinja2.Markup(readme_html))
     elif os.path.isfile(real_path):
+        incr_download_count(real_path)
         return send_from_directory(app.config['FILE_PATH'], path)
     else:
         abort(403)

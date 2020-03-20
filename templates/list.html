@@ -23,6 +23,7 @@ Files in {{path}}
           <th>Name</th>
           <th>Size</th>
           <th>Modified</th>
+          <th>Downloads</th>
         </tr>
       </thead>
       <tbody>
@@ -36,6 +37,7 @@ Files in {{path}}
           <td><a href="{{entry.url}}">{{entry.name}}</a></td>
           <td>{% if entry.is_file %} {{entry.stat.st_size | humanize_size}} {% endif %}</td>
           <td>{{entry.stat.st_mtime | date_time}}</td>
+          <td>{{entry.downloads}}</td>
         </tr>
         {% endfor %}
       </tbody>
