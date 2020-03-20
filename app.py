@@ -32,7 +32,7 @@ fa_icons = {
 def guess_fa_icon(filename, is_folder=False):
     if is_folder:
         return 'folder-open'
-    for part in reversed(filename.split('.')):
+    for part in map(str.lower, reversed(filename.split('.'))):
         for k, v in fa_icons.items():
             if k == part or (isinstance(k, tuple) and part in k):
                 return v
