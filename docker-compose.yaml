@@ -3,6 +3,8 @@ services:
   web:
     build:
       context: .
+    environment:
+      - SITE_NAME
     ports:
       - "127.0.0.1:${PORT}:8000"
     restart: always
