@@ -25,11 +25,10 @@ fa_icons = {
     ('jpg', 'jpeg', 'gif', 'png', 'bmp', 'tif', 'tiff', 'ico', 'icn', 'icns'): 'file-image',
     ('mp3', 'ogg', 'wav', 'aac', 'aif', 'aifc', 'aiff', 'flac', 'm4a', 'mid',
         'midi', 'mp2', 'mpa', 'oga', 'snd', 'swa', 'w64', 'wma'): 'file-audio',
-    ('webm', 'mkv', 'flv', 'flv', 'vob', 'ogv', 'ogg', 'drc', 'gifv',
-        'mng', 'avi', 'mov', 'qt', 'wmv', 'yuv', 'rm', 'rmvb', 'asf', 'amv',
-        'mp4', 'm4p', 'm4v', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'mpg', 'mpeg',
-        'm2v', 'svi', '3gp', '3g2', 'mxf', 'roq', 'nsv', 'flv', 'f4v',
-        'f4p', 'f4a', 'f4b'): 'file-video',
+    ('mp4', 'webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'avi',
+        'mov', 'qt', 'wmv', 'yuv', 'rm', 'rmvb', 'asf', 'amv', 'm4p', 'm4v',
+        'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'mpg', 'mpeg', 'm2v', 'svi', '3gp',
+        '3g2', 'mxf', 'roq', 'nsv', 'f4v', 'f4p', 'f4a', 'f4b'): 'file-video',
 }
 def guess_fa_icon(filename, is_folder=False):
     if is_folder:
