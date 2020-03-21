@@ -9,6 +9,7 @@ COPY requirements.txt .
 
 RUN pip install -r requirements.txt gunicorn==20.0.4
 
+COPY static ./static
 COPY templates ./templates
 COPY app.py .
 COPY config.py .
