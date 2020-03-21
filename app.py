@@ -1,3 +1,4 @@
+import hashlib
 import os
 import time
 
@@ -51,6 +52,20 @@ def get_download_count(path):
 def incr_download_count(path):
     return redis_client.hincrby('file:' + path, 'downloads', 1)
 
+_static_hash_cache = {}
+def append_static_file_hash(file):
+    full_path = os.path.join(app.static_folder, file)
+    url = app.static_url_path + '/' + file
+    if os.path.isfile(full_path):
+        if full_path not in _static_hash_cache:
+            md5 = hashlib.md5()
+            with open(full_path, 'rb') as f:
+                while (chunk := f.read(2 ** 16)):
+                    md5.update(chunk)
+            _static_hash_cache[full_path] = md5.hexdigest()
+        url += '?' + _static_hash_cache[full_path]
+    return url
+
 @app.template_filter('humanize_size')
 def humanize_size(size):
     return humanize.naturalsize(size)
@@ -58,6 +73,10 @@ def humanize_size(size):
 @app.template_filter('date_time')
 def date_time_filter(raw):
     return time.strftime('%c %Z', time.localtime(raw))
+
+@app.context_processor
+def add_utils():
+    return {'static_path': append_static_file_hash}
 
 @app.errorhandler(404)
 def handle_404(*_):
