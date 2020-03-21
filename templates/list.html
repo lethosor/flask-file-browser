@@ -16,32 +16,34 @@ Files in {{path}}
   </nav>
   {{readme_html}}
   {% if entries %}
-    <table class="table">
-      <thead>
-        <tr>
-          <th style="width: 1em;"></th>
-          <th>Name</th>
-          <th>Size</th>
-          <th>Modified</th>
-          <th>Downloads</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for entry in entries %}
-        <tr>
-          <td>
-            <a href="{{entry.url}}" title="{% if entry.is_file %}File{% else %}Folder{% endif %}">
-              <i class="far fa-{{entry.icon or 'file'}}"></i>
-            </a>
-          </td>
-          <td><a href="{{entry.url}}">{{entry.name}}</a></td>
-          <td>{% if entry.is_file %} {{entry.stat.st_size | humanize_size}} {% endif %}</td>
-          <td data-time="{{entry.stat.st_mtime | int}}">{{entry.stat.st_mtime | date_time}}</td>
-          <td>{{entry.downloads}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-nowrap-outer">
+      <table class="table table-nowrap">
+        <thead>
+          <tr>
+            <th style="width: 1em;"></th>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Modified</th>
+            <th>Downloads</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in entries %}
+          <tr>
+            <td>
+              <a href="{{entry.url}}" title="{% if entry.is_file %}File{% else %}Folder{% endif %}">
+                <i class="far fa-{{entry.icon or 'file'}}"></i>
+              </a>
+            </td>
+            <td><a href="{{entry.url}}">{{entry.name}}</a></td>
+            <td>{% if entry.is_file %} {{entry.stat.st_size | humanize_size}} {% endif %}</td>
+            <td data-time="{{entry.stat.st_mtime | int}}">{{entry.stat.st_mtime | date_time}}</td>
+            <td>{{entry.downloads}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
     <div class="alert alert-danger">No files found in this folder. <a href="..">Back</a></div>
   {% endif %}
