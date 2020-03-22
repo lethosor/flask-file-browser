@@ -1,7 +1,3 @@
-.table-nowrap-outer {
-    overflow-x: auto;
-}
-
-.table-nowrap {
+.nowrap {
     white-space: nowrap;
 }
