@@ -52,6 +52,21 @@ def get_download_count(path):
 def incr_download_count(path):
     return redis_client.hincrby('file:' + path, 'downloads', 1)
 
+
+def process_dir_entry(e, url_path, disk_path):
+    downloads = get_download_count(os.path.join(disk_path, e.name))
+    if downloads is None:
+        downloads = ''
+    return {
+        'name': e.name,
+        'is_file': e.is_file(),
+        'url': url_for('file_list', path=os.path.join(url_path, e.name) +
+            ('/' if not e.is_file() else '')),
+        'stat': e.stat(),
+        'icon': guess_fa_icon(e.name, not e.is_file()),
+        'downloads': downloads,
+    }
+
 _static_hash_cache = {}
 def append_static_file_hash(file):
     full_path = os.path.join(app.static_folder, file)
@@ -95,19 +110,9 @@ def file_list(path=''):
     if os.path.isdir(real_path):
         if not path.endswith('/'):
             path += '/'
-        entries = [{
-                'name': e.name,
-                'is_file': e.is_file(),
-                'url': url_for('file_list', path=os.path.join(path, e.name) +
-                    ('/' if not e.is_file() else '')),
-                'stat': e.stat(),
-                'icon': guess_fa_icon(e.name, not e.is_file()),
-                'downloads': get_download_count(os.path.join(real_path, e.name)),
-            } for e in list(os.scandir(real_path))
-                if e.name != README_NAME and not e.name.startswith('.')]
-        for entry in entries:
-            if entry['downloads'] is None:
-                entry['downloads'] = ''
+        entries = [process_dir_entry(e, path, real_path)
+            for e in list(os.scandir(real_path))
+            if e.name != README_NAME and not e.name.startswith('.')]
         # folders on top, then alphabetically
         entries.sort(key=lambda e: (e['is_file'], e['name']))
 
