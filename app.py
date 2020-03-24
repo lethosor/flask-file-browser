@@ -7,7 +7,7 @@ import jinja2
 import markdown
 import redis
 
-from flask import abort, Flask, render_template, request, safe_join, send_from_directory, url_for
+from flask import abort, Flask, jsonify, render_template, request, safe_join, send_from_directory, url_for
 
 README_NAME = 'README.md'
 
@@ -15,6 +15,9 @@ app = Flask(__name__)
 app.config.from_object('config')
 
 redis_client = redis.Redis('redis')
+
+def is_json_request():
+    return request.args.get('format', '').lower() == 'json'
 
 fa_icons = {
     ('txt', 'md', 'rst', 'log', 'conf', 'ini'): 'file-alt',
@@ -54,15 +57,17 @@ def incr_download_count(path):
 
 
 def process_dir_entry(e, url_path, disk_path):
+    stat = e.stat()
     downloads = get_download_count(os.path.join(disk_path, e.name))
-    if downloads is None:
+    if not is_json_request() and downloads is None:
         downloads = ''
     return {
         'name': e.name,
         'is_file': e.is_file(),
         'url': url_for('file_list', path=os.path.join(url_path, e.name) +
             ('/' if not e.is_file() else '')),
-        'stat': e.stat(),
+        'size': stat.st_size,
+        'mtime': stat.st_mtime,
         'icon': guess_fa_icon(e.name, not e.is_file()),
         'downloads': downloads,
     }
@@ -95,6 +100,8 @@ def add_utils():
 
 @app.errorhandler(404)
 def handle_404(*_):
+    if is_json_request():
+        return jsonify({'error': 'This file or folder does not exist.'}), 404
     # note that we set the 404 status explicitly
     return render_template('404.html'), 404
 
@@ -139,6 +146,10 @@ def file_list(path=''):
         except Exception:
             readme_html = '<div class="alert alert-warning">Could not parse folder description</div>'
 
+        if is_json_request():
+            return jsonify({
+                'entries': entries,
+            })
         return render_template('list.html', path=human_path, entries=entries,
             breadcrumbs=breadcrumbs, readme_html=jinja2.Markup(readme_html))
     elif os.path.isfile(real_path):

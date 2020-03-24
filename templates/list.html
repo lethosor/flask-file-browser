@@ -36,8 +36,8 @@ Files in {{path}}
               </a>
             </td>
             <td><a href="{{entry.url}}">{{entry.name}}</a></td>
-            <td>{% if entry.is_file %} {{entry.stat.st_size | humanize_size}} {% endif %}</td>
-            <td data-time="{{entry.stat.st_mtime | int}}">{{entry.stat.st_mtime | date_time}}</td>
+            <td>{% if entry.is_file %} {{entry.size | humanize_size}} {% endif %}</td>
+            <td data-time="{{entry.mtime | int}}">{{entry.mtime | date_time}}</td>
             <td>{{entry.downloads}}</td>
           </tr>
           {% endfor %}
