@@ -117,9 +117,13 @@ def file_list(path=''):
     if os.path.isdir(real_path):
         if not path.endswith('/'):
             path += '/'
-        entries = [process_dir_entry(e, path, real_path)
-            for e in list(os.scandir(real_path))
-            if e.name != README_NAME and not e.name.startswith('.')]
+        entries = []
+        for e in list(os.scandir(real_path)):
+            if e.name != README_NAME and not e.name.startswith('.'):
+                try:
+                    entries.append(process_dir_entry(e, path, real_path))
+                except OSError:
+                    pass
         # folders on top, then alphabetically
         entries.sort(key=lambda e: (e['is_file'], e['name']))
 
