@@ -5,9 +5,11 @@ import time
 import humanize
 import jinja2
 import markdown
+import markupsafe
 import redis
 
-from flask import abort, Flask, jsonify, render_template, request, safe_join, send_from_directory, url_for
+from flask import abort, Flask, jsonify, render_template, request, send_from_directory, url_for
+from werkzeug.security import safe_join
 
 README_NAME = 'README.md'
 
@@ -155,7 +157,7 @@ def file_list(path=''):
                 'entries': entries,
             })
         return render_template('list.html', path=human_path, entries=entries,
-            breadcrumbs=breadcrumbs, readme_html=jinja2.Markup(readme_html))
+            breadcrumbs=breadcrumbs, readme_html=markupsafe.Markup(readme_html))
     elif os.path.isfile(real_path):
         incr_download_count(real_path)
         return send_from_directory(app.config['FILE_PATH'], path)
