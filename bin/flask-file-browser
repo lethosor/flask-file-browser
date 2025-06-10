@@ -1,0 +1,35 @@
+#!/usr/bin/env -S uv run --script
+
+import argparse
+import os
+import subprocess
+
+import flask
+
+root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print(root)
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-p", "--port", type=int, default=8000)
+parser.add_argument("--host")
+parser.add_argument("--title")
+parser.add_argument("--root", default=os.getcwd())
+args = parser.parse_args()
+
+env = {
+    **os.environ,
+    "FILE_PATH": args.root,
+}
+if args.title:
+    env["SITE_NAME"] = args.title
+
+subprocess.run(
+    [
+        "flask",
+        "run",
+        "--port",
+        str(args.port),
+    ] + (["--host", args.host] if args.host else []),
+    cwd=root,
+    env=env,
+)

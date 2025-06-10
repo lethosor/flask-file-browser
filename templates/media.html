@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{name}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="{{static_path('main.css')}}">
+</head>
+<body class="media">
+  {% if type == "image" %}
+    <img src="{{path}}">
+  {% elif type == "video" %}
+    <video controls autoplay loop>
+      <source src="{{ path }}">
+    </video>
+  {% elif type == "audio" %}
+    <audio src="{{path}}">
+    </audio>
+  {% else %}
+    <div class="alert alert-danger">Unknown media type: {{type}}.</div>
+  {% endif %}
+</body>
+</html>

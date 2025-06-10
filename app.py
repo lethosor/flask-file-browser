@@ -16,7 +16,13 @@ README_NAME = 'README.md'
 app = Flask(__name__)
 app.config.from_object('config')
 
-redis_client = redis.Redis('redis')
+# redis_client = redis.Redis('redis')
+class StubClient:
+    def hget(*args):
+        return 0
+    def hincrby(*args):
+        return None
+redis_client = StubClient()
 
 def is_json_request():
     return request.args.get('format', '').lower() == 'json'
@@ -28,7 +34,7 @@ fa_icons = {
     ('doc', 'docx'): 'file-word',
     ('xls', 'xlsx'): 'file-excel',
     ('ppt', 'pptx'): 'file-powerpoint',
-    ('jpg', 'jpeg', 'gif', 'png', 'bmp', 'tif', 'tiff', 'ico', 'icn', 'icns'): 'file-image',
+    ('jpg', 'jpeg', 'gif', 'png', 'bmp', 'tif', 'tiff', 'ico', 'icn', 'icns', 'webp'): 'file-image',
     ('mp3', 'ogg', 'wav', 'aac', 'aif', 'aifc', 'aiff', 'flac', 'm4a', 'mid',
         'midi', 'mp2', 'mpa', 'oga', 'snd', 'swa', 'w64', 'wma'): 'file-audio',
     ('mp4', 'webm', 'mkv', 'flv', 'vob', 'ogv', 'drc', 'gifv', 'mng', 'avi',
@@ -63,7 +69,7 @@ def process_dir_entry(e, url_path, disk_path):
     downloads = get_download_count(os.path.join(disk_path, e.name))
     if not is_json_request() and downloads is None:
         downloads = ''
-    return {
+    res = {
         'name': e.name,
         'is_file': e.is_file(),
         'url': url_for('file_list', path=os.path.join(url_path, e.name) +
@@ -73,6 +79,12 @@ def process_dir_entry(e, url_path, disk_path):
         'icon': guess_fa_icon(e.name, not e.is_file()),
         'downloads': downloads,
     }
+    res['pretty_url'] = res['url']
+    if res['icon'] in ('file-image', 'file-audio', 'file-video'):
+        res['pretty_url'] = url_for('media',
+            path=os.path.join(url_path, e.name),
+        )
+    return res
 
 _static_hash_cache = {}
 def append_static_file_hash(file):
@@ -163,3 +175,11 @@ def file_list(path=''):
         return send_from_directory(app.config['FILE_PATH'], path)
     else:
         abort(403)
+
+@app.route('/__media__/<path:path>')
+def media(path):
+    name = path.split('/')[-1]
+    type = guess_fa_icon(name).split('-')[1]
+    real_path = safe_join(app.config['FILE_PATH'], path)
+    incr_download_count(real_path)
+    return render_template('media.html', path=url_for('file_list', path=path), name=name, type=type)
