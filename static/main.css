@@ -30,3 +30,7 @@ body.media video, body.media audio, body.media img {
     max-width: 100%;
     margin: auto;
 }
+
+body.media audio {
+    width: 100%;
+}

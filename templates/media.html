@@ -13,7 +13,7 @@
       <source src="{{ path }}">
     </video>
   {% elif type == "audio" %}
-    <audio src="{{path}}">
+    <audio controls src="{{path}}">
     </audio>
   {% else %}
     <div class="alert alert-danger">Unknown media type: {{type}}.</div>
