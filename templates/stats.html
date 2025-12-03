@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}
+Stats
+{% endblock %}
+{% block content %}
+  {% if entries %}
+    <div class="table-responsive">
+      <table class="table nowrap">
+        <thead>
+          <tr>
+            <th>Downloads</th>
+            <th style="width: 1em;"></th>
+            <th>Path</th>
+            <th>Size</th>
+            <th>Modified</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in entries %}
+          <tr>
+            <td>{{entry.downloads}}</td>
+            <td>
+              {% if entry.exists %}<a href="{{entry.url}}" title="{% if entry.is_file %}File{% else %}Folder{% endif %}">{% endif %}
+                <i class="far fa-{{entry.icon or 'file'}}"></i>
+              {% if entry.exists %}</a>{% endif %}
+            </td>
+            <td>
+              {% if entry.exists %}<a href="{{entry.pretty_url}}">{% else %}<s>{% endif %}
+                {{entry.name}}
+              {% if entry.exists %}</a>{% else %}</s>{% endif %}
+            </td>
+            {% if entry.exists %}
+            <td>{% if entry.is_file and entry.exists %} {{entry.size | humanize_size}} {% endif %}</td>
+            <td data-time="{{entry.mtime | int}}">{{entry.mtime | date_time}}</td>
+            {% else %}
+            <td></td>
+            <td></td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-danger">No files found in this folder. <a href="..">Back</a></div>
+  {% endif %}
+{% endblock %}

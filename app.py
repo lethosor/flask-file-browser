@@ -36,6 +36,7 @@ fa_icons = {
         'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'mpg', 'mpeg', 'm2v', 'svi', '3gp',
         '3g2', 'mxf', 'roq', 'nsv', 'f4v', 'f4p', 'f4a', 'f4b'): 'file-video',
 }
+MEDIA_ICONS = ('file-image', 'file-audio', 'file-video')
 def guess_fa_icon(filename, is_folder=False):
     if is_folder:
         return 'folder-open'
@@ -74,7 +75,7 @@ def process_dir_entry(e, url_path, disk_path):
         'downloads': downloads,
     }
     res['pretty_url'] = res['url']
-    if res['icon'] in ('file-image', 'file-audio', 'file-video'):
+    if res['icon'] in MEDIA_ICONS:
         res['pretty_url'] = url_for('media',
             path=os.path.join(url_path, e.name),
         )
@@ -176,3 +177,45 @@ def media(path):
     type = guess_fa_icon(name).split('-')[1]
     real_path = safe_join(app.config['FILE_PATH'], path)
     return render_template('media.html', path=url_for('file_list', path=path), name=name, type=type)
+
+@app.route('/__stats__')
+def stats():
+    entries = []
+    FILE_KEY_PREFIX = 'file:'
+    for key in redis_client.keys():
+        key = key.decode()
+        if key.startswith(FILE_KEY_PREFIX):
+            file_real_path = key.removeprefix(FILE_KEY_PREFIX)
+            file_web_path = file_real_path.removeprefix(app.config['FILE_PATH']).lstrip('/')
+            if count_raw := redis_client.hget(key, 'downloads'):
+                count_raw = count_raw.decode()
+                if not count_raw.isdigit():
+                    continue
+                count = int(count_raw)
+                try:
+                    stat = os.stat(file_real_path)
+                    exists = True
+                    size = stat.st_size
+                    mtime = stat.st_mtime
+                except OSError:
+                    exists = False
+                    size = None
+                    mtime = None
+                res = {
+                    'name': file_web_path,
+                    'downloads': count,
+                    'url': url_for('file_list', path=file_web_path),
+                    'icon': guess_fa_icon(file_real_path),
+                    'is_file': True,
+                    'size': size,
+                    'mtime': mtime,
+                    'exists': exists,
+                }
+                res['pretty_url'] = res['url']
+                if res['icon'] in MEDIA_ICONS:
+                    res['pretty_url'] = url_for('media', path=file_web_path)
+                entries.append(res)
+
+    entries.sort(key=lambda e: -e['downloads'])
+
+    return render_template('stats.html', entries=entries)
