@@ -16,13 +16,7 @@ README_NAME = 'README.md'
 app = Flask(__name__)
 app.config.from_object('config')
 
-# redis_client = redis.Redis('redis')
-class StubClient:
-    def hget(*args):
-        return 0
-    def hincrby(*args):
-        return None
-redis_client = StubClient()
+redis_client = redis.Redis('localhost', 9119)
 
 def is_json_request():
     return request.args.get('format', '').lower() == 'json'
