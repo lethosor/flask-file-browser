@@ -7,13 +7,15 @@
 </head>
 <body class="media">
   {% if type == "image" %}
-    <img src="{{path}}">
+    <a href="{{url_raw}}">
+      <img src="{{url}}">
+    </a>
   {% elif type == "video" %}
     <video controls autoplay loop>
-      <source src="{{ path }}">
+      <source src="{{url}}">
     </video>
   {% elif type == "audio" %}
-    <audio controls src="{{path}}">
+    <audio controls src="{{url}}">
     </audio>
   {% else %}
     <div class="alert alert-danger">Unknown media type: {{type}}.</div>

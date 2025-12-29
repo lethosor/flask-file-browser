@@ -166,7 +166,8 @@ def file_list(path=''):
         return render_template('list.html', path=human_path, entries=entries,
             breadcrumbs=breadcrumbs, readme_html=markupsafe.Markup(readme_html))
     elif os.path.isfile(real_path):
-        incr_download_count(real_path)
+        if not request.args.get('embed'):
+            incr_download_count(real_path)
         return send_from_directory(app.config['FILE_PATH'], path)
     else:
         abort(403)
@@ -176,7 +177,11 @@ def media(path):
     name = path.split('/')[-1]
     type = guess_fa_icon(name).split('-')[1]
     real_path = safe_join(app.config['FILE_PATH'], path)
-    return render_template('media.html', path=url_for('file_list', path=path), name=name, type=type)
+    incr_download_count(real_path)
+    return render_template('media.html', name=name, type=type,
+        url=url_for('file_list', path=path, embed=1),
+        url_raw=url_for('file_list', path=path),
+    )
 
 @app.route('/__stats__')
 def stats():
