@@ -177,6 +177,8 @@ def media(path):
     name = path.split('/')[-1]
     type = guess_fa_icon(name).split('-')[1]
     real_path = safe_join(app.config['FILE_PATH'], path)
+    if not os.path.exists(real_path):
+        abort(404)
     incr_download_count(real_path)
     return render_template('media.html', name=name, type=type,
         url=url_for('file_list', path=path, embed=1),
