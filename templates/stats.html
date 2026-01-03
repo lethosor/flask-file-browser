@@ -3,6 +3,12 @@
 Stats
 {% endblock %}
 {% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">{{config.SITE_NAME}}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Stats</li>
+    </ol>
+  </nav>
   {% if entries %}
     <div class="table-responsive">
       <table class="table nowrap">
