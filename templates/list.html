@@ -12,6 +12,9 @@ Files in {{path}}
           <li class="breadcrumb-item"><a href="{{bc.url}}">{{bc.name}}</a></li>
         {% endif %}
       {% endfor %}
+      {% if show_gallery %}
+        <li class="ml-auto"><a href="{{url_for('gallery', path=path)}}">Gallery</a></li>
+      {% endif %}
     </ol>
   </nav>
   {{readme_html}}

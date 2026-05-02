@@ -34,3 +34,35 @@ body.media video, body.media audio, body.media img {
 body.media audio {
     width: 100%;
 }
+
+.gallery-grid {
+    --gallery-media-w: 200px;
+    --gallery-media-h: calc(var(--gallery-media-w) * 4/3);
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, var(--gallery-media-w));
+    justify-content: center;
+    gap: 4px;
+}
+
+@media (max-width: 450px) {
+    .gallery-grid {
+        --gallery-media-w: 150px;
+    }
+}
+
+.gallery-item {
+    width: var(--gallery-media-w);
+    height: var(--gallery-media-h);
+    overflow: hidden;
+    background: #ddd;
+    word-wrap: break-word;
+}
+
+.gallery-item img,
+.gallery-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}

@@ -75,11 +75,42 @@ def process_dir_entry(e, url_path, disk_path):
         'downloads': downloads,
     }
     res['pretty_url'] = res['url']
-    if res['icon'] in MEDIA_ICONS:
+    res['is_media'] = res['icon'] in MEDIA_ICONS
+    if res['is_media']:
         res['pretty_url'] = url_for('media',
             path=os.path.join(url_path, e.name),
         )
+        res['embed_url'] = url_for('file_list',
+            path=os.path.join(url_path, e.name), embed=1)
     return res
+
+def make_entries(path, real_path):
+    entries = []
+    for e in list(os.scandir(real_path)):
+        if e.name != README_NAME and not e.name.startswith('.'):
+            try:
+                entries.append(process_dir_entry(e, path, real_path))
+            except OSError:
+                pass
+    # folders on top, then alphabetically
+    entries.sort(key=lambda e: (e['is_file'], e['name']))
+    return entries
+
+def make_breadcrumbs(path):
+    path_parts = list(filter(bool, path.split('/')))
+    breadcrumbs = [{
+        'name': app.config['SITE_NAME'],
+        'url': url_for('file_list'),
+        'last': False,
+    }]
+    for i in range(len(path_parts)):
+        breadcrumbs.append({
+            'name': path_parts[i],
+            'url': url_for('file_list', path='/'.join(path_parts[:i+1]) + '/'),
+            'last': False,
+        })
+    breadcrumbs[-1]['last'] = True
+    return breadcrumbs
 
 _static_hash_cache = {}
 def append_static_file_hash(file):
@@ -126,29 +157,9 @@ def file_list(path=''):
     if os.path.isdir(real_path):
         if not path.endswith('/'):
             path += '/'
-        entries = []
-        for e in list(os.scandir(real_path)):
-            if e.name != README_NAME and not e.name.startswith('.'):
-                try:
-                    entries.append(process_dir_entry(e, path, real_path))
-                except OSError:
-                    pass
-        # folders on top, then alphabetically
-        entries.sort(key=lambda e: (e['is_file'], e['name']))
 
-        path_parts = list(filter(bool, path.split('/')))
-        breadcrumbs = [{
-            'name': app.config['SITE_NAME'],
-            'url': url_for('file_list'),
-            'last': False,
-        }]
-        for i in range(len(path_parts)):
-            breadcrumbs.append({
-                'name': path_parts[i],
-                'url': url_for('file_list', path='/'.join(path_parts[:i+1]) + '/'),
-                'last': False,
-            })
-        breadcrumbs[-1]['last'] = True
+        entries = make_entries(path, real_path)
+        breadcrumbs = make_breadcrumbs(path)
 
         readme_path = os.path.join(real_path, README_NAME)
         readme_html = ''
@@ -159,18 +170,35 @@ def file_list(path=''):
         except Exception:
             readme_html = '<div class="alert alert-warning">Could not parse folder description</div>'
 
+        show_gallery = any(e['is_media'] for e in entries)
+
         if is_json_request():
             return jsonify({
                 'entries': entries,
             })
         return render_template('list.html', path=human_path, entries=entries,
-            breadcrumbs=breadcrumbs, readme_html=markupsafe.Markup(readme_html))
+            breadcrumbs=breadcrumbs, readme_html=markupsafe.Markup(readme_html),
+            show_gallery=show_gallery)
     elif os.path.isfile(real_path):
         if not request.args.get('embed'):
             incr_download_count(real_path)
         return send_from_directory(app.config['FILE_PATH'], path)
     else:
         abort(403)
+
+@app.route('/__gallery__/<path:path>')
+def gallery(path):
+    real_path = safe_join(app.config['FILE_PATH'], path)
+    if not os.path.isdir(real_path):
+        abort(400)
+
+    breadcrumbs = make_breadcrumbs(path)
+    entries = [e for e in make_entries(path, real_path)
+        if e['is_file'] and e['is_media']
+        and e['icon'] in ('file-image', 'file-video')]
+
+    return render_template('gallery.html', path=path, breadcrumbs=breadcrumbs,
+        entries=entries)
 
 @app.route('/__media__/<path:path>')
 def media(path):

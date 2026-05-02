@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}
+Files in {{path}}
+{% endblock %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      {% for bc in breadcrumbs %}
+        <li class="breadcrumb-item"><a href="{{bc.url}}">{{bc.name}}</a></li>
+      {% endfor %}
+      <li class="breadcrumb-item">Gallery</li>
+    </ol>
+  </nav>
+  {{readme_html}}
+  {% if entries %}
+    <div class="gallery-grid">
+      {% for entry in entries %}
+        <a href="{{ entry.pretty_url }}" title="{{ entry.name }}">
+          <div class="gallery-item">
+            {% if entry.icon == 'file-image' %}
+              <img src="{{ entry.embed_url }}">
+            {% elif entry.icon == 'file-video' %}
+              <video>
+                <source src="{{ entry.embed_url }}#t=5">
+              </video>
+            {% else %}
+              {{ entry.name }}
+            {% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-danger">No files found in this folder. <a href="..">Back</a></div>
+  {% endif %}
+{% endblock %}
