@@ -15,8 +15,8 @@ Files in {{path}}
   {% if entries %}
     <div class="gallery-grid">
       {% for entry in entries %}
-        <a href="{{ entry.pretty_url }}" title="{{ entry.name }}">
-          <div class="gallery-item">
+        <div class="gallery-item">
+          <a href="{{ entry.pretty_url }}" title="{{ entry.name }}">
             {% if entry.icon == 'file-image' %}
               <img src="{{ entry.embed_url }}">
             {% elif entry.icon == 'file-video' %}
@@ -26,8 +26,17 @@ Files in {{path}}
             {% else %}
               {{ entry.name }}
             {% endif %}
-          </div>
-        </a>
+          </a>
+          <details class="menu">
+            <summary aria-label="Menu">&vellip;</summary>
+            <ul>
+              {% if entry.icon == 'file-image' %}
+                <li><a href="{{ entry.url }}" target="_blank">Raw</a></li>
+              {% endif %}
+              <li class="disabled"><span>{{ entry.downloads }}</span></li>
+            </ul>
+          </details>
+        </div>
       {% endfor %}
     </div>
   {% else %}

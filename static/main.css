@@ -54,6 +54,7 @@ body.media audio {
 .gallery-item {
     width: var(--gallery-media-w);
     height: var(--gallery-media-h);
+    position: relative;
     overflow: hidden;
     background: #ddd;
     word-wrap: break-word;
@@ -65,4 +66,53 @@ body.media audio {
     height: 100%;
     object-fit: cover;
     display: block;
+}
+
+.gallery-item details.menu {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+}
+
+.gallery-item details.menu summary {
+    width: 2em;
+    height: 2em;
+    display: grid;
+    place-items: center;
+    cursor: context-menu;
+    list-style: none;
+    border-radius: 1em;
+    background: rgba(0, 0, 0, 0.35);
+    color: white;
+    font-weight: bold;
+    user-select: none;
+}
+
+.gallery-item details.menu ul {
+    position: absolute;
+    top: 2em;
+    right: 0;
+    min-width: 120px;
+    margin: 0;
+    padding: 0.25rem 0;
+    list-style: none;
+    border-radius: 0.5rem;
+    background: white;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
+}
+
+.gallery-item details.menu li > * {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    white-space: nowrap;
+}
+
+.gallery-item details.menu li.disabled > * {
+    color: #999999;
+}
+
+.gallery-item details.menu li:not(.disabled) > *:hover,
+.gallery-item details.menu li:not(.disabled) > *:focus {
+    background: #eeeeee;
 }
