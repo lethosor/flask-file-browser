@@ -66,6 +66,7 @@ def process_dir_entry(e, url_path, disk_path):
         downloads = ''
     res = {
         'name': e.name,
+        'abspath': '/' + os.path.join(url_path, e.name),
         'is_file': e.is_file(),
         'url': url_for('file_list', path=os.path.join(url_path, e.name) +
             ('/' if not e.is_file() else '')),
@@ -254,3 +255,34 @@ def stats():
     entries.sort(key=lambda e: -e['downloads'])
 
     return render_template('stats.html', entries=entries)
+
+def walk_dir_entries(top_path):
+    try:
+        with os.scandir(top_path) as entries:
+            for entry in entries:
+                yield entry
+                if entry.is_dir(follow_symlinks=False):
+                    yield from walk_dir_entries(entry.path)
+    except PermissionError:
+        pass
+
+@app.route('/__recents__/')
+@app.route('/__recents__/<path:path>')
+def recents(path=''):
+    real_path = safe_join(app.config['FILE_PATH'], path)
+    if not os.path.isdir(real_path):
+        abort(400)
+
+    breadcrumbs = make_breadcrumbs(path)
+    all_entries = list(process_dir_entry(e, os.path.dirname(os.path.relpath(e.path, app.config['FILE_PATH'])), os.path.dirname(e.path)) for e in walk_dir_entries(real_path) if e.is_file())
+
+    entries = sorted(all_entries, key=lambda e: -e['mtime'])[:100]
+
+    for e in entries:
+        e['relpath'] = os.path.relpath(e['abspath'], '/' + path)
+
+    # import json
+    # return '<pre>{}</pre>'.format(json.dumps(all_entries, indent=2))
+
+    return render_template('recents.html', path=path, breadcrumbs=breadcrumbs,
+        entries=entries)

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}
+Recent files in {{path}}
+{% endblock %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      {% for bc in breadcrumbs %}
+        <li class="breadcrumb-item"><a href="{{bc.url}}">{{bc.name}}</a></li>
+      {% endfor %}
+      <li class="breadcrumb-item">Recents</li>
+    </ol>
+  </nav>
+  {{readme_html}}
+  {% if entries %}
+    <div class="table-responsive">
+      <table class="table nowrap">
+        <thead>
+          <tr>
+            <th style="width: 1em;"></th>
+            <th>Path</th>
+            <th>Size</th>
+            <th>Modified</th>
+            <th>Downloads</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in entries %}
+          <tr title="{{ entry }}">
+            <td>
+              <a href="{{entry.url}}" title="{% if entry.is_file %}File{% else %}Folder{% endif %}">
+                <i class="far fa-{{entry.icon or 'file'}}"></i>
+              </a>
+            </td>
+            <td>
+              <a href="{{entry.pretty_url}}">
+                {{entry.relpath}}
+              </a>
+            </td>
+            <td>{% if entry.is_file %} {{entry.size | humanize_size}} {% endif %}</td>
+            <td data-time="{{entry.mtime | int}}">{{entry.mtime | date_time}}</td>
+            <td>{{entry.downloads}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-danger">No files found in this folder. <a href="/{{ path }}">Back</a></div>
+  {% endif %}
+{% endblock %}
